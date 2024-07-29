@@ -6,10 +6,15 @@ const App = () => {
 
   const newNoteMutation = useMutation({
     mutationFn: createNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['notes'],
-      })
+    // onSuccess would receive the fulfilled Promise return val
+    onSuccess: (newNote) => {
+      // queryClient.invalidateQueries({
+      //   queryKey: ['notes'],
+      // })
+
+      // Get the current notes first from the cache(?)
+      const notes = queryClient.getQueryData(['notes'])
+      queryClient.setQueryData(['notes'], notes.concat(newNote))
     },
   })
 
@@ -44,6 +49,7 @@ const App = () => {
   const result = useQuery({
     queryKey: ['notes'],
     queryFn: getNotes,
+    refetchOnWindowFocus: false,
   })
   console.log(JSON.parse(JSON.stringify(result)))
 
